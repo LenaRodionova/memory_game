@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+
+<div class="memory_board">
+</div>
+
+<button class="memory-game_button">
+    Попробовать снова
+</button>
+
+</body>
+
+<script>
+
+    function flip(element) {
+        element.classList.add('flip');
+        element.classList.add('inactive');
+    }
+
+    function unflip(element) {
+        element.classList.remove('flip');
+        element.classList.remove('inactive');
+    }
+
+    function getTextFromCard(element) {
+        return element.querySelector('.back').textContent;
+    }
+
+    function shuffle(arr) {
+        let j, temp;
+        for (let i = arr.length - 1; i > 0; i--) {
+            j = Math.floor(Math.random() * (i + 1));
+            temp = arr[j];
+            arr[j] = arr[i];
+            arr[i] = temp;
+        }
+        return arr;
+    }
+
+    function createBoard() {
+        const memoryArray = ['A', 'A', 'Б', 'Б', 'В', 'В', 'Г', 'Г', 'Д', 'Д', 'Е', 'Е', 'Ж', 'Ж', 'З', 'З', 'И', 'И', 'К', 'К', 'Л', 'Л', 'М', 'М'];
+
+        const newArray = shuffle(memoryArray);
+        const memoryBoard = document.querySelector('.memory_board');
+        newArray.forEach(function (elem) {
+                let card = document.createElement('div');
+                card.classList.add('memory_card');
+                memoryBoard.appendChild(card);
+
+                let backCard = document.createElement('div');
+                backCard.classList.add('back');
+                card.appendChild(backCard);
+                backCard.textContent = elem;
+                let fontCard = document.createElement('div');
+                fontCard.classList.add('front');
+                card.appendChild(fontCard);
+
+                card.addEventListener('click', e => {
+                    let currentCard = e.target.closest('.memory_card');
+                    flip(currentCard);
+                    let comparingCard = currentCard.parentElement.querySelector('.comparing');
+
+                    if (comparingCard) {
+                        let comparingCardText = getTextFromCard(comparingCard);
+                        let currentCardText = getTextFromCard(currentCard);
+
+                        if (comparingCardText === currentCardText) {
+                            comparingCard.classList.remove('comparing');
+                            comparingCard.classList.add('success');
+                            currentCard.classList.add('success');
+                        } else {
+                            memoryBoard.classList.add('inactive');
+
+                            setTimeout(() => {
+                                memoryBoard.classList.remove('inactive');
+                                comparingCard.classList.remove('comparing');
+                                comparingCard.classList.add('failed');
+                                currentCard.classList.add('failed');
+                                unflip(comparingCard);
+                                unflip(currentCard);
+                                setTimeout(() => {
+                                    comparingCard.classList.remove('failed');
+                                    currentCard.classList.remove('failed');
+                                }, 1000)
+                            }, 1000);
+                        }
+                    } else {
+                        currentCard.classList.add('comparing');
+                    }
+                })
+            }
+        )
+    }
+
+    let button = document.querySelector(".memory-game_button");
+    let memoryBoard = document.querySelector('.memory_board');
+    button.addEventListener('click', e => {
+        memoryBoard.innerHTML = '';
+        createBoard();
+    });
+    createBoard();
+
+
+</script>
+</html>
